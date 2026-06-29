@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyên Đề Open Cloze Test - Ms Lê Hằng English</title>
+    <!-- Google Fonts: Quicksand mang phong cách trò chơi học tập, bo tròn đáng yêu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #8854C0;
+            --accent-color: #FDCB6E;
+            --teal-color: #00C9A7;
+            --correct-color: #00D26A;
+            --wrong-color: #FF4757;
+            --text-color: #2D3436;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Nền chuyển động Loang màu liên tục + Lớp họa tiết quả mây, ngôi sao lơ lửng độc lập */
+        body {
+            background: linear-gradient(-45deg, #8854C0, #FDCB6E, #00C9A7, #FF7675);
+            background-size: 400% 400%;
+            animation: gradientMovement 14s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M20 20 L35 20 L35 35 L20 35 Z M70 30 A 10 10 0 1 1 70 50 A 10 10 0 1 1 70 30 M100 20 L105 32 L118 32 L108 40 L112 52 L100 44 L88 52 L92 40 L82 32 L95 32 Z' /%3E%3Cpath d='M35 90 C 40 80, 60 80, 65 90 C 70 100, 50 110, 35 90 Z M95 95 A 12 12 0 1 1 95 94 Z' /%3E%3C/g%3E%3C/svg%3E");
+            animation: patternsFloating 30s linear infinite;
+        }
+
+        @keyframes gradientMovement {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes patternsFloating {
+            0% { background-position: 0 0; }
+            100% { background-position: 600px 1200px; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            z-index: 1;
+        }
+
+        /* Heading nhỏ gọn, tinh tế tôn vinh giao diện chính */
+        header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        header h5 {
+            font-size: 1rem;
+            color: #FFFFFF;
+            background: rgba(0, 0, 0, 0.15);
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            font-weight: 700;
+        }
+
+        /* Khung thông báo cực kỳ quan trọng bắt buộc */
+        .warning-box {
+            background: #FFEAA7;
+            border: 4px solid #FDCB6E;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 0 #E17055;
+            color: #2D3436;
+            text-align: center;
+        }
+
+        .warning-box h4 {
+            font-size: 1.3rem;
+            color: #D63031;
+            margin-bottom: 8px;
+            font-weight: 900;
+        }
+
+        .warning-box p {
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 700;
+        }
+
+        .warning-box em {
+            display: block;
+            margin-top: 10px;
+            color: #6C5CE7;
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        /* Thẻ chương mục lớn phân tách đoạn văn bài thi */
+        .passage-block-title {
+            background: #6C5CE7;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin: 35px 0 15px 0;
+            font-size: 1.25rem;
+            font-weight: 900;
+            box-shadow: 0 6px 0 #4834D4;
+        }
+
+        /* Nội dung khối hiển thị văn bản đoạn văn */
+        .passage-text-display {
+            background: #F8F9FA;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            color: #34495E;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            border-left: 6px solid var(--primary-color);
+            font-weight: 700;
+            text-align: justify;
+        }
+
+        .passage-blank-badge {
+            background: #E2E8F0;
+            color: var(--primary-color);
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-weight: 900;
+            margin: 0 4px;
+            border-bottom: 3px solid #CBD5E1;
+        }
+
+        .passage-blank-badge.answered-correct {
+            background: var(--correct-color) !important;
+            color: white !important;
+            border-color: #008040 !important;
+        }
+
+        .passage-blank-badge.answered-wrong {
+            background: var(--wrong-color) !important;
+            color: white !important;
+            border-color: #B32431 !important;
+        }
+
+        /* Giao diện Thẻ bài trắc nghiệm ABCD cho từng ô trống */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.08);
+            border: 3px solid #E2E8F0;
+        }
+
+        .card-header-info {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #94A3B8;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .prompt-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        /* Hệ thống nút lựa chọn phong cách 3D dày */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #FFFFFF;
+            border: 3px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 12px 18px;
+            font-size: 1.02rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #E2E8F0;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            width: 100%;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            transform: scale(1.01) translateY(-2px);
+            box-shadow: 0 7px 0 #CBD5E1;
+            background: #FDF4FF;
+        }
+
+        .option-btn:active:not(.disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #CBD5E1;
+        }
+
+        /* Định danh màu chuẩn chỉnh Đúng/Sai */
+        .option-btn.correct {
+            background: var(--correct-color) !important;
+            border-color: #00B359 !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #008040 !important;
+        }
+
+        .option-btn.wrong {
+            background: var(--wrong-color) !important;
+            border-color: #E03847 !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #B32431 !important;
+        }
+
+        .option-btn.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Hiệu ứng rung lắc khi chọn sai phương án */
+        @keyframes shakeFrame {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake-animation {
+            animation: shakeFrame 0.4s ease-in-out;
+        }
+
+        /* Khung hiển thị giải thích 4 bước sư phạm mở bung tức thì */
+        .explanation-box {
+            margin-top: 18px;
+            background: #F3EAFE;
+            border-left: 6px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 15px 18px;
+            display: none;
+            animation: slideDown 0.4s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .explanation-title {
+            color: var(--primary-color);
+            font-weight: 900;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+
+        .explanation-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #333333;
+        }
+
+        /* Nút nộp bài cuối cùng tổng hợp điểm */
+        .submit-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .submit-all-btn {
+            background: #6C5CE7;
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            border-radius: 22px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #4834D4;
+            transition: all 0.1s;
+        }
+
+        .submit-all-btn:hover {
+            background: #5F27CD;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #4834D4;
+        }
+
+        /* Canvas cấu hình bắn pháo hoa giấy Confetti lung linh */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Hộp thoại Popup báo tổng điểm và lời khuyên của cô giáo */
+        .modal-mask {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-mask.active { opacity: 1; pointer-events: auto; }
+        .modal-container {
+            background: white;
+            border-radius: 25px;
+            padding: 35px;
+            max-width: 520px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+            border: 4px solid var(--accent-color);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        .modal-mask.active .modal-container { transform: scale(1); }
+        .modal-score { font-size: 3rem; font-weight: 900; color: var(--primary-color); margin: 15px 0; }
+        .modal-feedback { font-size: 1.05rem; color: var(--text-color); font-weight: 700; line-height: 1.6; margin-bottom: 25px; }
+        .modal-btn {
+            background: var(--teal-color);
+            color: white; border: none; padding: 12px 30px;
+            font-size: 1.05rem; font-weight: 700; border-radius: 14px;
+            box-shadow: 0 4px 0 #00A387; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <header>
+            <h5>Giáo viên tạo: Ms Lê Hằng English</h5>
+        </header>
+
+        <div class="warning-box">
+            <h4>⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️</h4>
+            <p>Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.</p>
+            <p>Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!</p>
+            <em>* Kéo tới đâu, làm tới đó! *</em>
+        </div>
+
+        <!-- Bàn đạp render các khối câu hỏi của bài thi -->
+        <div id="dynamic-quiz-engine"></div>
+
+        <div class="submit-section">
+            <button class="submit-all-btn" onclick="calculateExamResult()">NỘP BÀI TỔNG KẾT 🎉</button>
+        </div>
+    </div>
+
+    <!-- Popup Modal kết quả -->
+    <div class="modal-mask" id="score-modal">
+        <div class="modal-container">
+            <h2>🏆 KẾT QUẢ THI ĐẠT ĐƯỢC 🏆</h2>
+            <div class="modal-score" id="score-display-box">0 / 47</div>
+            <div class="modal-feedback" id="feedback-display-box">Lời nhận xét động viên...</div>
+            <button class="modal-btn" onclick="restartEntireQuiz()">Làm Lại Đề Thi 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // Hệ thống âm thanh tự động sinh bằng Web Audio API độc quyền cấp cao
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtxInstance = null;
+
+        function triggerAudioFeedback(status) {
+            try {
+                if (!audioCtxInstance) audioCtxInstance = new AudioCtx();
+                const osc = audioCtxInstance.createOscillator();
+                const gain = audioCtxInstance.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtxInstance.destination);
+
+                if (status === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtxInstance.currentTime); // C5
+                    osc.frequency.setValueAtTime(783.99, audioCtxInstance.currentTime + 0.1); // G5
+                    gain.gain.setValueAtTime(0.2, audioCtxInstance.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtxInstance.currentTime + 0.3);
+                    osc.start(audioCtxInstance.currentTime);
+                    osc.stop(audioCtxInstance.currentTime + 0.3);
+                } else if (status === 'wrong') {
+                    const now = audioCtxInstance.currentTime;
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(196, now); // G3
+                    osc.frequency.setValueAtTime(146.83, now + 0.12); // D3
+                    osc.frequency.setValueAtTime(110, now + 0.25); // A2
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                }
+            } catch (e) { console.log("Audio contexts blocked or not allowed by browser rules."); }
+        }
+
+        // TOÀN VẸN DỮ LIỆU 6 ĐOẠN VĂN MẪU KHÔNG CẮT XÉN - ĐÃ BIẾN ĐỔI SANG TRẮC NGHIỆM ABCD VỚI GIẢI THÍCH 4 BƯỚC
+        const examDatabase = [
+            {
+                passageId: 6,
+                title: "Passage 6 (Đề tuyển sinh vào lớp 10 THPT Chuyên Tỉnh Hà Nam)",
+                textMarkup: "One of the most urgent environmental <span class='passage-blank-badge' id='badge-6-1'>(1)</span> in the world today is the shortage of clean water. Having clean drinking water is a basic human <span class='passage-blank-badge' id='badge-6-2'>(2)</span>. But acid rain, industrial pollution and garbage have <span class='passage-blank-badge' id='badge-6-3'>(3)</span> many sources of water undrinkable. Lakes, reservoirs and even entire seas have become vast pools <span class='passage-blank-badge' id='badge-6-4'>(4)</span> poison. Lake Baikal in Russia is one of the largest lakes in the world. It <span class='passage-blank-badge' id='badge-6-5'>(5)</span> a rich variety of animals and plants, including 1,300 rare species that do not exist anywhere else in the world. But they are being destroyed by the massive volumes of industrial effluent <span class='passage-blank-badge' id='badge-6-6'>(6)</span> pour into the lake everyday. Even where law existed, the government did not have the power to enforce them. Most industries simply ignore the regulations. The Mediterranean Sea occupies 1% of the world's water surface. But it is the dumping ground for 50% of all marine pollution. Almost 16 <span class='passage-blank-badge' id='badge-6-7'>(7)</span> regularly throw industrial wastes a few miles off-shore.",
+                questions: [
+                    {
+                        uid: "6_1", blankNum: 1, prompt: "Chọn đáp án thích hợp điền vào ô trống số (1):",
+                        options: ["problems", "solutions", "effects", "benefits"], correct: "problems",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Một trong những vấn đề môi trường cấp bách nhất trên thế giới ngày nay là tình trạng thiếu nước sạch.<br><strong>2. Phân tích 4 đáp án:</strong><br>- A. problems (n): các vấn đề nan giải.<br>- B. solutions (n): giải pháp.<br>- C. effects (n): tác động, ảnh hưởng.<br>- D. benefits (n): lợi ích.<br><strong>3. Tại sao chọn A:</strong> Đi kèm tính từ 'urgent' (cấp bách) và bối cảnh tiêu cực 'shortage of clean water' (thiếu nước sạch), từ thích hợp nhất để lập luận vấn đề nan giải là 'problems'.<br><strong>4. Tại sao các từ khác sai:</strong> Không phù hợp tính chất tiêu cực độc hại môi trường được nêu trong bối cảnh đoạn văn."
+                    },
+                    {
+                        uid: "6_2", blankNum: 2, prompt: "Chọn đáp án thích hợp điền vào ô trống số (2):",
+                        options: ["right", "need", "desire", "luxury"], correct: "right",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Có nước uống sạch là một quyền cơ bản của con người.<br><strong>2. Phân tích 4 đáp án:</strong><br>- A. right (n): quyền lợi công bằng hợp pháp.<br>- B. need (n): nhu cầu cơ bản.<br>- C. desire (n): mong muốn khát khao.<br>- D. luxury (n): điều xa xỉ.<br><strong>3. Tại sao chọn A:</strong> Cụm từ cố định nổi tiếng toàn cầu là <em>'basic human right'</em> nghĩa là quyền cơ bản của con người (quyền sinh tồn, tiếp cận nguồn nước sạch). Ngoài ra từ 'need' cũng có lý nhưng 'right' mang tầm vĩ mô và tính pháp lý cao hơn trong các văn bản nghị luận xã hội học.<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành thuật ngữ chính trị - xã hội học chuẩn xác."
+                    },
+                    {
+                        uid: "6_3", blankNum: 3, prompt: "Chọn đáp án thích hợp điền vào ô trống số (3):",
+                        options: ["made", "caused", "done", "created"], correct: "made",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nhưng mưa axit, ô nhiễm công nghiệp và rác thải đã khiến nhiều nguồn nước không thể uống được.<br><strong>2. Phân tích 4 đáp án:</strong> Động từ ở dạng phân từ V3 đứng sau trợ động từ 'have'.<br><strong>3. Tại sao chọn A:</strong> Áp dụng cấu trúc ngữ pháp hệ từ: <em>'make + tân ngữ (sources of water) + tính từ (undrinkable)'</em> nghĩa là biến cái gì thành trạng thái như thế nào.<br><strong>4. Tại sao các từ khác sai:</strong> Động từ 'cause' thường đi với cấu trúc 'cause something TO be adj' chứ không đi trực tiếp tính từ liền sau như vậy."
+                    },
+                    {
+                        uid: "6_4", blankNum: 4, prompt: "Chọn đáp án thích hợp điền vào ô trống số (4):",
+                        options: ["of", "with", "in", "by"], correct: "of",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Các hồ, hồ chứa và thậm chí toàn bộ các vùng biển đã trở thành những hồ chứa chất độc khổng lồ.<br><strong>2. Phân tích 4 đáp án:</strong> Các giới từ đi kèm danh từ pool.<br><strong>3. Tại sao chọn A:</strong> Cấu trúc danh từ định lượng chứa đựng: <em>'pools of poison'</em> (những vũng, những bể chứa đầy chất độc hại). Giới từ 'of' dùng để chỉ thành phần bản chất vật chất cấu tạo nên bể chứa đó.<br><strong>4. Tại sao các từ khác sai:</strong> Các giới từ khác không tạo ra cấu trúc ngữ nghĩa sở hữu chất liệu bản chất chính xác."
+                    },
+                    {
+                        uid: "6_5", blankNum: 5, prompt: "Chọn đáp án thích hợp điền vào ô trống số (5):",
+                        options: ["contains", "harbors", "retains", "excludes"], correct: "contains",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nó chứa đựng một sự đa dạng phong phú các loài động vật và thực vật...<br><strong>2. Phân tích 4 đáp án:</strong><br>- A. contains (v): chứa đựng bên trong.<br>- B. harbors (v): che giấu, ẩn chứa chứa chấp.<br>- C. retains (v): giữ lại.<br>- D. excludes (v): loại trừ bóc tách.<br><strong>3. Tại sao chọn A:</strong> Chia theo chủ ngữ ngôi thứ ba số ít 'It' (thay thế cho Hồ Baikal), từ 'contains' mang nghĩa trung tính khoa học, chỉ dung tích sức chứa sinh thái của hồ.<br><strong>4. Tại sao các từ khác sai:</strong> Sai ngữ cảnh sử dụng từ vựng khoa học địa lý sinh thái."
+                    },
+                    {
+                        uid: "6_6", blankNum: 6, prompt: "Chọn đáp án thích hợp điền vào ô trống số (6):",
+                        options: ["which", "who", "whom", "whose"], correct: "which",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nhưng chúng đang bị phá hủy bởi khối lượng khổng lồ nước thải công nghiệp đổ vào hồ mỗi ngày.<br><strong>2. Phân tích 4 đáp án:</strong> Các đại từ quan hệ dùng cho mệnh đề quan hệ.<br><strong>3. Tại sao chọn A:</strong> Từ đứng trước bổ nghĩa là danh từ chỉ vật <em>'industrial effluent'</em> (nước thải công nghiệp), do đó đại từ quan hệ thay thế làm chủ ngữ cho động từ 'pour' bắt buộc phải là 'which' hoặc 'that'.<br><strong>4. Tại sao các từ khác sai:</strong> 'who, whom, whose' là những đại từ chuyên biệt chỉ dùng đại diện cho con người."
+                    },
+                    {
+                        uid: "6_7", blankNum: 7, prompt: "Chọn đáp án thích hợp điền vào ô trống số (7):",
+                        options: ["countries", "cities", "factories", "ships"], correct: "countries",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Gần 16 quốc gia thường xuyên đổ chất thải công nghiệp ra cách bờ biển vài dặm.<br><strong>2. Phân tích 4 đáp án:</strong><br>- A. countries (n): quốc gia ven biển Địa Trung Hải.<br>- B. cities (n): thành phố.<br>- C. factories (n): nhà máy.<br>- D. ships (n): tàu thuyền.<br><strong>3. Tại sao chọn A:</strong> Địa Trung Hải được bao bọc bao quanh bởi các quốc gia có đường bờ biển. Số liệu thực tế mang tính địa chính trị môi trường chỉ ra các quốc gia (countries) xả thải trực tiếp vào vùng nội hải.<br><strong>4. Tại sao các từ khác sai:</strong> Dựa vào bối cảnh vĩ mô toàn cầu của đoạn văn khi nhắc tới vùng biển lớn Địa Trung Hải."
+                    }
+                ]
+            },
+            {
+                passageId: 7,
+                title: "Passage 7 (Đề tuyển sinh vào lớp 10 THPT Chuyên Tỉnh Quảng Ngãi)",
+                textMarkup: "Everyone wants to reduce pollution but the pollution problem is <span class='passage-blank-badge' id='badge-7-1'>(1)</span> complicated as it is serious. It is complicated <span class='passage-blank-badge' id='badge-7-2'>(2)</span> much pollution is caused by things that benefit people. For example, exhaust from <span class='passage-blank-badge' id='badge-7-3'>(3)</span> causes a large percentage of air pollution, but the automobile <span class='passage-blank-badge' id='badge-7-4'>(4)</span> transportation to millions of people. Factories discharge much <span class='passage-blank-badge' id='badge-7-5'>(5)</span> the material that pollutes the air and water, but factories give employment to a large number of people. Thus, to end <span class='passage-blank-badge' id='badge-7-6'>(6)</span> greatly reduce pollution immediately would have to <span class='passage-blank-badge' id='badge-7-7'>(7)</span> using many things that benefit them. Most of the people do not want to do that, of course, but pollution can be <span class='passage-blank-badge' id='badge-7-8'>(8)</span> reduced in several ways. Scientists and engineers can work to find ways to lessen the <span class='passage-blank-badge' id='badge-7-9'>(9)</span> of pollution that such things as automobiles and factories cause. Governments can pass and enforce laws that <span class='passage-blank-badge' id='badge-7-1'>(10)</span> businesses and individuals to stop or cut down on certain polluting activities.",
+                questions: [
+                    {
+                        uid: "7_1", blankNum: 1, prompt: "Chọn đáp án thích hợp điền vào ô trống số (1):",
+                        options: ["as", "so", "more", "too"], correct: "as",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Mọi người đều muốn giảm ô nhiễm nhưng vấn đề ô nhiễm lại phức tạp giống y như tính chất nghiêm trọng của nó.<br><strong>2. Phân tích cấu trúc 4 đáp án:</strong> Cấu trúc so sánh ngang bằng.<br><strong>3. Tại sao chọn A:</strong> Phía sau tính từ có từ <em>'as it is serious'</em>, báo hiệu công thức so sánh bằng cố định: <em>'as + adj + as'</em>.<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành cấu trúc so sánh tương hợp ngữ pháp với từ 'as' ở phía sau."
+                    },
+                    {
+                        uid: "7_2", blankNum: 2, prompt: "Chọn đáp án thích hợp điền vào ô trống số (2):",
+                        options: ["because", "although", "despite", "unless"], correct: "because",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nó phức tạp là bởi vì phần lớn ô nhiễm được gây ra bởi những thứ mang lại lợi ích cho con người.<br><strong>2. Phân tích liên từ 4 đáp án:</strong><br>- A. because: bởi vì (chỉ nguyên nhân).<br>- B. although: mặc dù (nhượng bộ).<br>- C. despite: mặc dù (đi với cụm từ).<br>- D. unless: trừ khi.<br><strong>3. Tại sao chọn A:</strong> Vế sau giải thích nguyên căn lý do tại sao vấn đề lại phức tạp nên ta cần một liên từ chỉ nguyên nhân hệ quả là 'because'.<br><strong>4. Tại sao các từ khác sai:</strong> Sai logic kết nối ý nghĩa giữa hai mệnh đề câu."
+                    },
+                    {
+                        uid: "7_3", blankNum: 3, prompt: "Chọn đáp án thích hợp điền vào ô trống số (3):",
+                        options: ["automobiles", "bicycles", "trains", "airplanes"], correct: "automobiles",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Ví dụ, khí thải từ ô tô xe cộ gây ra tỷ lệ lớn ô nhiễm không khí...<br><strong>2. Phân tích từ vựng 4 đáp án:</strong> Danh từ chỉ phương tiện vận tải.<br><strong>3. Tại sao chọn A:</strong> Chìa khóa nằm ngay ở vế câu tiếp sau: <em>'but the automobile provides...'</em>. Việc lặp từ đồng nghĩa bổ trợ cấu trúc chứng minh từ điền vào ô trống chính là số nhiều 'automobiles'.<br><strong>4. Tại sao các từ khác sai:</strong> Sai lệch thông tin đồng bộ ngữ cảnh liên kết nội văn bản."
+                    },
+                    {
+                        uid: "7_4", blankNum: 4, prompt: "Chọn đáp án thích hợp điền vào ô trống số (4):",
+                        options: ["provides", "prevents", "buys", "destroys"], correct: "provides",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...nhưng xe ô tô lại cung cấp phương tiện giao thông đi lại cho hàng triệu con người.<br><strong>2. Phân tích động từ 4 đáp án:</strong><br>- A. provides (v): cung cấp ban tặng.<br>- B. prevents (v): ngăn chặn.<br>- C. buys (v): mua bán.<br>- D. destroys (v): phá hủy.<br><strong>3. Tại sao chọn A:</strong> Động từ 'provide something to/for someone' nghĩa là cung cấp cái gì cho ai. Ô tô mang lại sự tiện nghi di chuyển.<br><strong>4. Tại sao các từ khác sai:</strong> Các hành động khác không phù hợp với danh từ làm tân ngữ 'transportation' (sự vận chuyển đi lại)."
+                    },
+                    {
+                        uid: "7_5", blankNum: 5, prompt: "Chọn đáp án thích hợp điền vào ô trống số (5):",
+                        options: ["of", "from", "with", "by"], correct: "of",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Các nhà máy thải ra phần lớn các chất liệu làm ô nhiễm bầu không khí và nguồn nước...<br><strong>2. Phân tích cấu trúc định lượng 4 đáp án:</strong> Giới từ đi sau lượng từ much.<br><strong>3. Tại sao chọn A:</strong> Cấu trúc phân đoạn danh từ xác định: <em>'much OF the material'</em> (phần lớn trong số các chất liệu xác định). Giới từ 'of' là bắt buộc khi đứng trước cụm danh từ có mạo từ 'the'.<br><strong>4. Tại sao các từ khác sai:</strong> Các giới từ khác không tạo thành cấu trúc phân lượng ngữ pháp chính thống."
+                    },
+                    {
+                        uid: "7_6", blankNum: 6, prompt: "Chọn đáp án thích hợp điền vào ô trống số (6):",
+                        options: ["or", "and", "but", "so"], correct: "or",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Do đó, để chấm dứt hoặc giảm thiểu đáng kể tình trạng ô nhiễm ngay lập tức...<br><strong>2. Phân tích liên từ 4 đáp án:</strong> Liên từ kết hợp song hành.<br><strong>3. Tại sao chọn A:</strong> Ta thấy hai động từ có mức độ tăng tiến giảm trừ: 'end' (chấm dứt hoàn toàn) hoặc 'greatly reduce' (giảm mạnh). Từ lựa chọn logic nhất là liên từ mang tính loại trừ tăng giảm 'or'.<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo nên tính logic cân bằng bổ trợ giữa hai hành động giả định."
+                    },
+                    {
+                        uid: "7_7", blankNum: 7, prompt: "Chọn đáp án thích hợp điền vào ô trống số (7):",
+                        options: ["stop", "start", "keep", "enjoy"], correct: "stop",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...người ta sẽ phải dừng sử dụng nhiều thứ mang lại lợi ích cho chính họ.<br><strong>2. Phân tích cấu trúc động từ đi với V-ing 4 đáp án:</strong><br>- A. stop + V-ing: dừng hẳn hành động lại.<br>- B. start: bắt đầu.<br>- C. keep: tiếp tục duy trì.<br>- D. enjoy: thưởng thức thích thú.<br><strong>3. Tại sao chọn A:</strong> Để triệt tiêu ô nhiễm, con người buộc lòng phải ngưng sử dụng (stop using) các thiết bị phát thải, đây là một sự đánh đổi cực kỳ nan giải.<br><strong>4. Tại sao các từ khác sai:</strong> Đi ngược lại mục đích giảm thiểu ô nhiễm của câu nghị luận."
+                    },
+                    {
+                        uid: "7_8", blankNum: 8, prompt: "Chọn đáp án thích hợp điền vào ô trống số (8):",
+                        options: ["gradually", "immediately", "never", "suddenly"], correct: "gradually",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...nhưng ô nhiễm có thể được giảm thiểu một cách dần dần bằng một vài phương pháp.<br><strong>2. Phân tích trạng từ 4 đáp án:</strong><br>- A. gradually: dần dần, theo từng bước.<br>- B. immediately: ngay lập tức (vế trước đã khẳng định không thể làm ngay được).<br>- C. never: không bao giờ.<br>- D. suddenly: đột ngột.<br><strong>3. Tại sao chọn A:</strong> Trái ngược với việc cắt giảm cực đoan ngay tức khắc ở vế trước, vế này mở ra lối thoát khả thi là giảm bớt từ từ, có lộ trình (gradually reduced).<br><strong>4. Tại sao các từ khác sai:</strong> Vi phạm tính logic lập luận đối lập giữa hai câu văn liền kề."
+                    },
+                    {
+                        uid: "7_9", blankNum: 9, prompt: "Chọn đáp án thích hợp điền vào ô trống số (9):",
+                        options: ["amount", "number", "quality", "source"], correct: "amount",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Các nhà khoa học và kỹ sư có thể làm việc để tìm cách làm giảm lượng ô nhiễm mà ô tô và nhà máy gây ra.<br><strong>2. Phân tích lượng từ 4 đáp án:</strong><br>- A. amount: số lượng (đi với danh từ không đếm được).<br>- B. number: số lượng (đi với danh từ đếm được số nhiều).<br><strong>3. Tại sao chọn A:</strong> Danh từ đứng sau cấu trúc là <em>'pollution'</em> là danh từ trừu tượng không đếm được, vì vậy từ đo lường bắt buộc phải là 'amount'.<br><strong>4. Tại sao các từ khác sai:</strong> 'number' sai quy tắc ngữ pháp danh từ đếm được/không đếm được."
+                    },
+                    {
+                        uid: "7_10", blankNum: 10, prompt: "Chọn đáp án thích hợp điền vào ô trống số (10):",
+                        options: ["require", "forbid", "prevent", "let"], correct: "require",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Chính phủ có thể thông qua và thực thi các luật lệ yêu cầu các doanh nghiệp và cá nhân dừng hoặc cắt giảm...<br><strong>2. Phân tích cấu trúc động từ 4 đáp án:</strong> Cấu trúc đi với tân ngữ + to-V ('businesses and individuals to stop').<br><strong>3. Tại sao chọn A:</strong> Cấu trúc <em>'require someone TO do something'</em> nghĩa là yêu cầu, bắt buộc ai làm gì theo luật định pháp lý.<br><strong>4. Tại sao các từ khác sai:</strong> 'prevent' đi với giới từ from; 'forbid' mang nghĩa cấm đoán trái ngữ cảnh chỉ mục tiêu cắt giảm hành vi; 'let' đi với động từ nguyên mẫu không to."
+                    }
+                ]
+            },
+            {
+                passageId: 8,
+                title: "Passage 8 (Đề tuyển sinh vào lớp 10 THPT Chuyên Sư Phạm Hà Nội)",
+                textMarkup: "In these days of high unemployment, it is often difficult for young people to find a job. If they are lucky <span class='passage-blank-badge' id='badge-8-1'>(1)</span> to be asked to go for an interview, they may find <span class='passage-blank-badge' id='badge-8-2'>(2)</span> there are at least 20 other applicants for the <span class='passage-blank-badge' id='badge-8-3'>(3)</span>. If a company is thinking of offering <span class='passage-blank-badge' id='badge-8-4'>(4)</span> a job, they will ask you for at least one reference from either your previous employer <span class='passage-blank-badge' id='badge-8-5'>(5)</span> someone who knows you well. <span class='passage-blank-badge' id='badge-8-6'>(6)</span> taking up your job, you may have to sign a contract. You will probably have to do some training, <span class='passage-blank-badge' id='badge-8-7'>(7)</span> help you to do the job more successfully. Once you have decided <span class='passage-blank-badge' id='badge-8-8'>(8)</span> that this is your chosen career, you will then have to work <span class='passage-blank-badge' id='badge-8-9'>(9)</span> to try and get promotion, which usually brings more responsibility and more money! If you are unlucky, you may be made redundant, and not be able to find <span class='passage-blank-badge' id='badge-8-10'>(10)</span> job. It is also a good idea to pay some money into a pension scheme, which will help you to look after yourself and your family when you are retired. Finally, good luck",
+                questions: [
+                    {
+                        uid: "8_1", blankNum: 1, prompt: "Chọn đáp án thích hợp điền vào ô trống số (1):",
+                        options: ["enough", "too", "so", "very"], correct: "enough",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nếu họ may mắn đủ để được mời đi tham gia phỏng vấn xin việc...<br><strong>2. Phân tích cấu trúc vị trí từ 4 đáp án:</strong> Vị trí đứng sau tính từ 'lucky'.<br><strong>3. Tại sao chọn A:</strong> Quy tắc vị trí của trạng từ chỉ mức độ đủ: <em>'Adj + enough + to-V'</em>. Các từ 'too, so, very' đều phải đứng trước tính từ.<br><strong>4. Tại sao các từ khác sai:</strong> Sai quy tắc vị trí trật tự từ vựng hình thái học cấu trúc câu."
+                    },
+                    {
+                        uid: "8_2", blankNum: 2, prompt: "Chọn đáp án thích hợp điền vào ô trống số (2):",
+                        options: ["that", "what", "which", "if"], correct: "that",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...họ có thể nhận thấy rằng có ít nhất 20 ứng viên khác cũng nộp đơn...<br><strong>2. Phân tích cấu trúc từ nối mệnh đề danh ngữ 4 đáp án:</strong> Đứng sau động từ nhận thức 'find'.<br><strong>3. Tại sao chọn A:</strong> Từ <em>'that'</em> làm nhiệm vụ mở đầu cho một mệnh đề danh ngữ hoàn chỉnh đóng vai trò làm tân ngữ trực tiếp cho động từ 'find' (nhận thấy rằng sự thật là...).<br><strong>4. Tại sao các từ khác sai:</strong> Các đại từ khác không phù hợp cấu trúc mệnh đề trần thuật khách quan."
+                    },
+                    {
+                        uid: "8_3", blankNum: 3, prompt: "Chọn đáp án thích hợp điền vào ô trống số (3):",
+                        options: ["job", "interview", "company", "boss"], correct: "job",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...có ít nhất 20 ứng viên khác cạnh tranh cho cùng vị trí công việc đó.<br><strong>2. Phân tích danh từ bối cảnh 4 đáp án:</strong><br>- A. job (n): vị trí công việc.<br>- B. interview (n): cuộc phỏng vấn.<br><strong>3. Tại sao chọn A:</strong> Mục đích tối hậu của các ứng viên (applicants) khi đi nộp đơn và phỏng vấn là giành lấy công việc (for the job/position).<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành cụm từ phù hợp với danh từ chỉ đối tượng nộp đơn 'applicants'."
+                    },
+                    {
+                        uid: "8_4", blankNum: 4, prompt: "Chọn đáp án thích hợp điền vào ô trống số (4):",
+                        options: ["you", "him", "them", "us"], correct: "you",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nếu một công ty đang cân nhắc mời bạn nhận việc, họ sẽ yêu cầu bạn cung cấp...<br><strong>2. Phân tích đại từ nhân xưng 4 đáp án:</strong> Đại từ làm tân ngữ.<br><strong>3. Tại sao chọn A:</strong> Chìa khóa nằm ngay ở vế sau của chính câu này: <em>'they will ask YOU for...'</em>. Để đồng bộ ngôi xưng hô trực tiếp hướng tới người đọc, vị trí này bắt buộc phải điền đại từ 'you'.<br><strong>4. Tại sao các từ khác sai:</strong> Làm mất đi tính đồng bộ thống nhất ngôi nhân xưng trong mạch văn."
+                    },
+                    {
+                        uid: "8_5", blankNum: 5, prompt: "Chọn đáp án thích hợp điền vào ô trống số (5):",
+                        options: ["or", "nor", "and", "but"], correct: "or",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...từ người chủ cũ của bạn hoặc một người nào đó hiểu rõ về bạn.<br><strong>2. Phân tích liên từ tương hợp 4 đáp án:</strong> Liên từ đi kèm cặp cấu trúc có sẵn.<br><strong>3. Tại sao chọn A:</strong> Phía trước câu xuất hiện từ khóa lựa chọn <em>'either'</em>. Ta áp dụng công thức tương hợp bắt buộc là: <em>'either... OR...'</em> (hoặc là cái này hoặc là cái kia).<br><strong>4. Tại sao các từ khác sai:</strong> Vi phạm quy tắc ghép cặp liên từ cố định ('neither... nor', 'either... or')."
+                    },
+                    {
+                        uid: "8_6", blankNum: 6, prompt: "Chọn đáp án thích hợp điền vào ô trống số (6):",
+                        options: ["Before", "After", "While", "Until"], correct: "Before",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Trước khi chính thức bắt đầu công việc, bạn có thể phải ký hợp đồng lao động.<br><strong>2. Phân tích giới từ mốc thời gian 4 đáp án:</strong> Đứng trước danh động từ V-ing 'taking up'.<br><strong>3. Tại sao chọn A:</strong> Theo quy trình tuyển dụng thông thường ngoài xã hội, việc ký kết hợp đồng (sign a contract) bắt buộc phải diễn ra trước mốc thời gian bắt đầu làm việc (Before taking up your job).<br><strong>4. Tại sao các từ khác sai:</strong> Sai lệch logic trình tự quy trình làm việc hành chính."
+                    },
+                    {
+                        uid: "8_7", blankNum: 7, prompt: "Chọn đáp án thích hợp điền vào ô trống số (7):",
+                        options: ["to", "which", "should", "will"], correct: "to",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Bạn có lẽ sẽ phải tham gia một khóa đào tạo ngắn, nhằm giúp bạn làm việc thành công hơn.<br><strong>2. Phân tích cấu trúc động từ 4 đáp án:</strong><br>- Nếu chọn 'which', động từ 'help' phải thêm s (which helps). Do đề bài viết từ 'help' nguyên mẫu đứng trơ trọi, suy ra đây là cấu trúc chỉ mục đích động từ nguyên mẫu có to: <em>'to help you'</em> (để giúp bạn).<br><strong>3. Tại sao chọn A:</strong> Phù hợp hoàn hảo công thức cấu trúc chỉ mục đích hành động của động từ nguyên thể.<br><strong>4. Tại sao các từ khác sai:</strong> Vi phạm quy tắc chia thì và sự hòa hợp chủ ngữ - động từ."
+                    },
+                    {
+                        uid: "8_8", blankNum: 8, prompt: "Chọn đáp án thích hợp điền vào ô trống số (8) (Lưu ý bẫy từ đi kèm cụm động từ):",
+                        options: ["on", "upon", "for", "out"], correct: "on",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Một khi bạn đã quyết định lựa chọn đây là sự nghiệp của mình...<br><strong>2. Phân tích giới từ đi sau động từ 'decided':</strong> Giới từ kết hợp tạo cụm động từ.<br><strong>3. Tại sao chọn A:</strong> Ta có cấu trúc cụm động từ đưa ra quyết định dứt khoát cho một mục tiêu cụ thể là: <em>'decide ON/UPON something'</em>. Trong đó 'on' là từ phổ biến nhất trong văn phong thi cử trắc nghiệm.<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành cụm từ chuẩn ngữ pháp mang ý nghĩa quyết định lựa chọn vật thể."
+                    },
+                    {
+                        uid: "8_9", blankNum: 9, prompt: "Chọn đáp án thích hợp điền vào ô trống số (9):",
+                        options: ["hard", "hardly", "slowly", "carelessly"], correct: "hard",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...bạn sẽ phải làm việc thật chăm chỉ để cố gắng đạt được sự thăng tiến...<br><strong>2. Phân tích từ loại bổ nghĩa động từ 4 đáp án:</strong> Trạng từ bổ nghĩa cho 'work'.<br><strong>3. Tại sao chọn A:</strong> Trạng từ của hard vẫn giữ nguyên hình thái là <em>'hard'</em> khi mang nghĩa chăm chỉ, nỗ lực lực điền.<br><strong>4. Tại sao các từ khác sai:</strong> 'hardly' mang nghĩa tiêu cực là 'hầu như không', sai hoàn toàn bản chất cần cù lao động để thăng tiến."
+                    },
+                    {
+                        uid: "8_10", blankNum: 10, prompt: "Chọn đáp án thích hợp điền vào ô trống số (10):",
+                        options: ["another", "other", "others", "the other"], correct: "another",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...bạn có thể bị sa thải sa thải và không thể tìm kiếm được một công việc khác.<br><strong>2. Phân tích ngữ pháp lượng từ 4 đáp án:</strong> Đi kèm danh từ đếm được số ít 'job'.<br><strong>3. Tại sao chọn A:</strong> Đại từ <em>'another'</em> luôn luôn đi liền trước một danh từ đếm được dạng số ít chưa xác định cụ thể (another job = một công việc khác bất kỳ).<br><strong>4. Tại sao các từ khác sai:</strong> 'other' bắt buộc phải đi với danh từ số nhiều; 'others' bản thân đóng vai trò làm cụm danh từ độc lập không đi kèm danh từ phía sau."
+                    }
+                ]
+            },
+            {
+                passageId: 9,
+                title: "Passage 9 (Đề tuyển sinh vào lớp 10 THPT Chuyên Tỉnh Nghệ An)",
+                textMarkup: "It is forecast that we can look forward to working <span class='passage-blank-badge' id='badge-9-1'>(1)</span> hours in the future, but it is necessary for health and tranquility to work a certain <span class='passage-blank-badge' id='badge-9-2'>(2)</span> of hours per week, ideally doing a variety of jobs - something schools have always known. It may be that house building will meet this need. It is a very basic human instinct. Gardening is a related activity. It is already <span class='passage-blank-badge' id='badge-9-3'>(3)</span> to cultivate many herbs and vegetables than to buy them in the shops and the house of the next decade should take this into <span class='passage-blank-badge' id='badge-9-4'>(4)</span>. <span class='passage-blank-badge' id='badge-9-5'>(5)</span> important question is that of energy conservation. The proportion of income <span class='passage-blank-badge' id='badge-9-6'>(6)</span> on keeping warm is steadily going up, and, with the cost of energy likely to double in real terms during the next ten years or <span class='passage-blank-badge' id='badge-9-7'>(7)</span> many large bodyinsulated old houses will become extremely expensive to use. The demand will be <span class='passage-blank-badge' id='badge-9-8'>(8)</span> small, well-insulated homes located in warm protected areas and making the best <span class='passage-blank-badge' id='badge-9-9'>(9)</span> of the sun’s warmth. Efficient heating units will be of prime importance. At <span class='passage-blank-badge' id='badge-9-10'>(10)</span>, we waste a lot of space in planning rooms which are awkward to use.",
+                questions: [
+                    {
+                        uid: "9_1", blankNum: 1, prompt: "Chọn đáp án thích hợp điền vào ô trống số (1):",
+                        options: ["fewer", "less", "more", "several"], correct: "fewer",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Người ta dự báo rằng chúng ta có thể mong đợi làm việc ít giờ đồng hồ hơn trong tương lai...<br><strong>2. Phân tích ngữ pháp so sánh lượng 4 đáp án:</strong> Đi với danh từ đếm được số nhiều 'hours'.<br><strong>3. Tại sao chọn A:</strong> Tính từ so sánh kém <em>'fewer'</em> chuyên biệt dùng bổ nghĩa cho danh từ đếm được số nhiều. Thể hiện xu hướng tự động hóa giảm giờ làm.<br><strong>4. Tại sao các từ khác sai:</strong> 'less' chỉ dùng cho danh từ không đếm được (như less time, không dùng less hours)."
+                    },
+                    {
+                        uid: "9_2", blankNum: 2, prompt: "Chọn đáp án thích hợp điền vào ô trống số (2):",
+                        options: ["number", "amount", "deal", "quantity"], correct: "number",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...nhưng việc lao động một số lượng giờ nhất định mỗi tuần là vô cùng cần thiết cho sức khỏe.<br><strong>2. Phân tích cụm từ định lượng 4 đáp án:</strong> Đi với danh từ số nhiều 'of hours'.<br><strong>3. Tại sao chọn A:</strong> Ta áp dụng cấu trúc đo lường danh từ số nhiều: <em>'a certain number of + N_số nhiều'</em> (một lượng, một số lượng cái gì).<br><strong>4. Tại sao các từ khác sai:</strong> 'amount' và 'deal' bắt buộc đi với danh từ không đếm được."
+                    },
+                    {
+                        uid: "9_3", blankNum: 3, prompt: "Chọn đáp án thích hợp điền vào ô trống số (3):",
+                        options: ["cheaper", "expensive", "more", "harder"], correct: "cheaper",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Hiện nay việc tự canh tác rau củ quả đã rẻ hơn rất nhiều so với việc đi mua chúng ở cửa hàng.<br><strong>2. Phân tích so sánh hơn 4 đáp án:</strong> Có từ khóa 'than' phía sau.<br><strong>3. Tại sao chọn A:</strong> Xét theo tư duy kinh tế tự cung tự cấp nông nghiệp, tự trồng rau (cultivate vegetables) giúp tiết kiệm tài chính, chi phí rẻ hơn (cheaper) so với mua sẵn ở siêu thị đắt đỏ.<br><strong>4. Tại sao các từ khác sai:</strong> Đi ngược logic lợi ích kinh tế tự trồng trọt được nêu trong bài viết."
+                    },
+                    {
+                        uid: "9_4", blankNum: 4, prompt: "Chọn đáp án thích hợp điền vào ô trống số (4):",
+                        options: ["account", "consideration", "mind", "view"], correct: "account",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...và những ngôi nhà thuộc thập kỷ tới nên cân nhắc đưa yếu tố này vào thiết kế.<br><strong>2. Phân tích thành ngữ cố định 4 đáp án:</strong> Giới từ 'into' đứng trước vị trí trống.<br><strong>3. Tại sao chọn A:</strong> Ta áp dụng cụm thành ngữ vô cùng kinh điển của tiếng Anh: <em>'take something into account'</em> (hoặc take into consideration) nghĩa là cân nhắc, xem xét kỹ lưỡng một yếu tố khi lên kế hoạch.<br><strong>4. Tại sao các từ khác sai:</strong> Các từ khác không tạo thành cấu trúc kết hợp từ vựng chính thống."
+                    },
+                    {
+                        uid: "9_5", blankNum: 5, prompt: "Chọn đáp án thích hợp điền vào ô trống số (5):",
+                        options: ["Another", "Other", "The other", "Others"], correct: "Another",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Một câu hỏi/vấn đề quan trọng khác cần bàn luận đó chính là việc bảo tồn năng lượng.<br><strong>2. Phân tích lượng từ đứng đầu câu 4 đáp án:</strong> Bổ nghĩa cho danh từ số ít 'important question'.<br><strong>3. Tại sao chọn A:</strong> Từ <em>'Another'</em> đứng trước danh từ số ít chỉ thêm một đối tượng, một chủ đề khác nằm trong danh sách thảo luận.<br><strong>4. Tại sao các từ khác sai:</strong> 'Other' phải đi với danh từ số nhiều; 'Others' đứng một mình làm chủ ngữ."
+                    },
+                    {
+                        uid: "9_6", blankNum: 6, prompt: "Chọn đáp án thích hợp điền vào ô trống số (6):",
+                        options: ["spent", "earned", "saved", "wasted"], correct: "spent",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Tỷ lệ thu nhập bị chi tiêu vào việc giữ ấm sưởi ấm ngôi nhà đang liên tục tăng lên...<br><strong>2. Phân tích cấu trúc rút gọn mệnh đề bị động 4 đáp án:</strong> Đứng sau danh từ 'income'.<br><strong>3. Tại sao chọn A:</strong> Cấu trúc kinh điển chi tiêu tiền của tài chính: <em>'income/money + SPENT + on + something/V-ing'</em> (khoản tiền bỏ ra đầu tư chi trả cho việc gì).<br><strong>4. Tại sao các từ khác sai:</strong> Sai mối liên kết ngữ nghĩa kinh tế tài chính gia đình."
+                    },
+                    {
+                        uid: "9_7", blankNum: 7, prompt: "Chọn đáp án thích hợp điền vào ô trống số (7):",
+                        options: ["so", "more", "less", "such"], correct: "so",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...trong khoảng mười năm tới hoặc xấp xỉ tầm đó...<br><strong>2. Phân tích cụm từ ước lượng thời gian 4 đáp án:</strong> Đứng cuối cụm thời gian số đếm.<br><strong>3. Tại sao chọn A:</strong> Ta có cụm từ chỉ khoảng thời gian xấp xỉ ước chừng cực kỳ phổ biến của người bản xứ là: <em>'ten years or so'</em> (tầm khoảng mười năm hoặc hơn kém một chút không đáng kể).<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành cụm từ mang tính chất ước lượng thời gian đúng chuẩn ngữ pháp."
+                    },
+                    {
+                        uid: "9_8", blankNum: 8, prompt: "Chọn đáp án thích hợp điền vào ô trống số (8):",
+                        options: ["for", "of", "to", "with"], correct: "for",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nhu cầu thị trường sẽ dành cho những ngôi nhà nhỏ, cách nhiệt tốt nằm ở vùng ấm áp...<br><strong>2. Phân tích giới từ đi sau danh từ 4 đáp án:</strong> Giới từ kết hợp danh từ chính.<br><strong>3. Tại sao chọn A:</strong> Quy chuẩn ngữ pháp bắt buộc của danh từ nhu cầu thị trường: <em>'demand FOR something'</em> (nhu cầu đòi hỏi, mong muốn có được vật phẩm gì).<br><strong>4. Tại sao các từ khác sai:</strong> Đi kèm sai giới từ chuyên biệt của danh từ 'demand'."
+                    },
+                    {
+                        uid: "9_9", blankNum: 9, prompt: "Chọn đáp án thích hợp điền vào ô trống số (9):",
+                        options: ["use", "value", "benefit", "effect"], correct: "use",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...và tận dụng được tối đa nguồn năng lượng sưởi ấm ấm áp từ ánh nắng mặt trời.<br><strong>2. Phân tích cụm từ cố định 4 đáp án:</strong> Đứng sau cụm từ 'making the best'.<br><strong>3. Tại sao chọn A:</strong> Áp dụng cấu trúc collocation nền tảng: <em>'make the best use of something'</em> nghĩa là tận dụng, khai thác tối đa giá trị hữu ích của cái gì.<br><strong>4. Tại sao các từ khác sai:</strong> Không điền đúng từ tạo thành cụm từ mang ý nghĩa khai thác triệt để tài nguyên."
+                    },
+                    {
+                        uid: "9_10", blankNum: 10, prompt: "Chọn đáp án thích hợp điền vào ô trống số (10):",
+                        options: ["present", "first", "once", "least"], correct: "present",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Hiện tại, chúng ta đang lãng phí rất nhiều không gian diện tích trong việc thiết kế phòng ốc...<br><strong>2. Phân tích trạng từ đầu câu đi sau giới từ 'At' 4 đáp án:</strong> Cụm từ thời gian.<br><strong>3. Tại sao chọn A:</strong> Cụm trạng ngữ thời gian chỉ thực trạng hiện nay: <em>'At present'</em> tương đương nghĩa với 'Currently' hoặc 'Now'.<br><strong>4. Tại sao các từ khác sai:</strong> 'At first' nghĩa là ban đầu đầu tiên (chỉ dùng cho chuỗi thứ tự sự kiện kể chuyện trong quá khứ)."
+                    }
+                ]
+            },
+            {
+                passageId: 10,
+                title: "Passage 10 (Đề tuyển sinh vào lớp 10 THPT Chuyên Tỉnh Nghệ An)",
+                textMarkup: "We live surrounded by objects and systems that we take for <span class='passage-blank-badge' id='badge-10-1'>(1)</span>, but which profoundly affect the way we behave, think, work, play, and in general lead our <span class='passage-blank-badge' id='badge-10-2'>(2)</span>. Look, for example, at the place in which you are reading this now, and see how much of <span class='passage-blank-badge' id='badge-10-3'>(3)</span> surrounds you is understandable, how much of it you could actually build yourself or repair <span class='passage-blank-badge' id='badge-10-4'>(4)</span> it cease to function. When we start the car or press the <span class='passage-blank-badge' id='badge-10-5'>(5)</span> in the elevator, or buy food in the supermarket, we gave no <span class='passage-blank-badge' id='badge-10-6'>(6)</span> to the complex devices or systems that make the car move, or the elevator rise, or the food appear on the shelves. Throughout this century we have become increasingly dependent on the products of <span class='passage-blank-badge' id='badge-10-7'>(7)</span>. They have already changed our lives: at simplest <span class='passage-blank-badge' id='badge-10-8'>(8)</span>, the availability of transport has made us physically less fit than our ancestors. Many people are alive only because they have been given <span class='passage-blank-badge' id='badge-10-9'>(9)</span> to disease through drugs. The vast majority of the world's population relies on the ability of technology to provide and transport food. We are unable to feed and clothe or keep <span class='passage-blank-badge' id='badge-10-10'>(10)</span> warm without technology.",
+                questions: [
+                    {
+                        uid: "10_1", blankNum: 1, prompt: "Chọn đáp án thích hợp điền vào ô trống số (1):",
+                        options: ["granted", "sure", "easy", "real"], correct: "granted",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Chúng ta sống xung quanh bởi các đồ vật và hệ thống mà chúng ta coi là hiển nhiên sẵn có...<br><strong>2. Phân tích cụm từ cố định 4 đáp án:</strong> Đứng sau cấu trúc 'take for'.<br><strong>3. Tại sao chọn A:</strong> Áp dụng cụm thành ngữ bất biến: <em>'take something for granted'</em> nghĩa là coi điều gì đó là hiển nhiên sẵn có, mặc định phải có nên không biết trân trọng giá trị.<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành kết hợp từ có nghĩa trong tiếng Anh."
+                    },
+                    {
+                        uid: "10_2", blankNum: 2, prompt: "Chọn đáp án thích hợp điền vào ô trống số (2):",
+                        options: ["lives", "life", "jobs", "hobbies"], correct: "lives",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...và nói chung là dẫn dắt, điều khiển toàn bộ cuộc sống của chúng ta.<br><strong>2. Phân tích danh từ đi sau tính từ sở hữu số nhiều 'our' 4 đáp án:</strong><br>- A. lives: những cuộc đời, cuộc sống (dạng số nhiều của life).<br>- B. life: số ít.<br><strong>3. Tại sao chọn A:</strong> Đại từ sở hữu 'our' đại diện cho tập hợp nhiều con người, do đó danh từ đi kèm phải ở số nhiều hệ thống tương ứng là 'lives'. Cụm 'lead our lives' nghĩa là sống cuộc sống của chúng ta.<br><strong>4. Tại sao các từ khác sai:</strong> Dùng từ số ít vi phạm sự tương hợp số lượng danh từ."
+                    },
+                    {
+                        uid: "10_3", blankNum: 3, prompt: "Chọn đáp án thích hợp điền vào ô trống số (3):",
+                        options: ["what", "that", "which", "who"], correct: "what",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...và xem xem có bao nhiêu phần trong số những thứ đang bao quanh bạn có thể hiểu được...<br><strong>2. Phân tích đại từ làm từ nối mệnh đề danh ngữ 4 đáp án:</strong> Đứng sau giới từ 'of'.<br><strong>3. Tại sao chọn A:</strong> Đại từ <em>'what'</em> đóng vai trò tích hợp gồm vật thể + từ nối (what surrounds you = những thứ bao quanh bạn), làm chủ ngữ cho động từ surrounds mà không cần danh từ chỉ vật đứng trước.<br><strong>4. Tại sao các từ khác sai:</strong> 'which' và 'that' cần một danh từ tiền ngữ đứng trước làm điểm tựa bổ nghĩa mệnh đề quan hệ."
+                    },
+                    {
+                        uid: "10_4", blankNum: 4, prompt: "Chọn đáp án thích hợp điền vào ô trống số (4) (Bẫy đảo ngữ câu điều kiện):",
+                        options: ["should", "if", "unless", "were"], correct: "should",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...hoặc tự tay sửa chữa nó nếu chẳng may nó ngừng hoạt động.<br><strong>2. Phân tích ngữ pháp động từ chia nguyên mẫu phía sau:</strong> Ta thấy chủ ngữ ngôi thứ ba số ít là 'it' nhưng động từ 'cease' lại để dạng nguyên thể không thêm s. Chứng tỏ câu đang mượn trợ động từ khuyết thiếu đứng trước đảo ngữ câu điều kiện loại 1.<br><strong>3. Tại sao chọn A:</strong> Cấu trúc đảo ngữ điều kiện: <em>'Should + S + V_nguyên thể'</em> thay thế cho cấu trúc 'If it ceases to function'.<br><strong>4. Tại sao các từ khác sai:</strong> Nếu điền 'if' thì bắt buộc từ 'cease' phải chia thêm s thành 'ceases'."
+                    },
+                    {
+                        uid: "10_5", blankNum: 5, prompt: "Chọn đáp án thích hợp điền vào ô trống số (5):",
+                        options: ["button", "floor", "door", "light"], correct: "button",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Khi chúng ta khởi động xe hơi hoặc nhấn nút bấm trong thang máy...<br><strong>2. Phân tích từ vựng 4 đáp án:</strong> Hành động vật lý đi với động từ 'press'.<br><strong>3. Tại sao chọn A:</strong> Cụm từ chỉ hành động cơ học điều khiển thang máy di chuyển là <em>'press the button'</em> (nhấn nút bấm bảng điều khiển).<br><strong>4. Tại sao các từ khác sai:</strong> Không ai dùng động từ nhấn ấn đè cho 'floor' (tầng nhà) hay 'door' (cửa)."
+                    },
+                    {
+                        uid: "10_6", blankNum: 6, prompt: "Chọn đáp án thích hợp điền vào ô trống số (6):",
+                        options: ["thought", "attention", "care", "mind"], correct: "thought",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...chúng ta chẳng dành một chút suy nghĩ mảy may nào cho các thiết bị phức tạp...<br><strong>2. Phân tích cụm từ cố định 4 đáp án:</strong> Đứng sau cấu trúc 'gave no'.<br><strong>3. Tại sao chọn A:</strong> Ta có công thức cụm từ cố định suy ngẫm cân nhắc về vấn đề gì là: <em>'give thought to something'</em> (suy nghĩ, để tâm cân nhắc điều gì).<br><strong>4. Tại sao các từ khác sai:</strong> 'pay attention to' dùng động từ pay chứ không đi với động từ give/gave."
+                    },
+                    {
+                        uid: "10_7", blankNum: 7, prompt: "Chọn đáp án thích hợp điền vào ô trống số (7):",
+                        options: ["technology", "nature", "history", "agriculture"], correct: "technology",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> ...chúng ta ngày càng trở nên phụ thuộc nặng nề vào các sản phẩm của công nghệ.<br><strong>2. Phân tích danh từ chủ đề đoạn văn 4 đáp án:</strong> Chữ khóa dẫn dắt toàn bài.<br><strong>3. Tại sao chọn A:</strong> Xuyên suốt đoạn văn đang phân tích mổ xẻ sự phụ thuộc của con người hiện đại vào máy móc, thang máy, ô tô... đó chính là các thành tựu của khoa học công nghệ (technology).<br><strong>4. Tại sao các từ khác sai:</strong> Lạc đề sai lệch tư tưởng cốt lõi của bài viết văn bản."
+                    },
+                    {
+                        uid: "10_8", blankNum: 8, prompt: "Chọn đáp án thích hợp điền vào ô trống số (8):",
+                        options: ["level", "point", "way", "stage"], correct: "level",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Ở mức độ mức độ đơn giản nhất, sự sẵn có của phương tiện giao thông khiến chúng ta yếu hơn tổ tiên.<br><strong>2. Phân tích cụm từ đi sau tính từ so sánh nhất 4 đáp án:</strong> Đứng sau cấu trúc giới từ 'at simplest'.<br><strong>3. Tại sao chọn A:</strong> Cụm từ cố định phân bổ góc nhìn nghị luận: <em>'at the simplest level'</em> nghĩa là xét ở mức độ, khía cạnh đơn giản cơ bản nhất.<br><strong>4. Tại sao các từ khác sai:</strong> Không tạo thành cụm từ diễn đạt phân cấp khía cạnh tư duy chuẩn mực."
+                    },
+                    {
+                        uid: "10_9", blankNum: 9, prompt: "Chọn đáp án thích hợp điền vào ô trống số (9):",
+                        options: ["immunity", "resistance", "protection", "access"], correct: "immunity",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Nhiều người sống sót chỉ vì họ đã được ban tặng khả năng miễn dịch đối với bệnh tật nhờ thuốc men.<br><strong>2. Phân tích danh từ y khoa chuyên ngành 4 đáp án:</strong> Cấu trúc đi với giới từ 'to disease'.<br><strong>3. Tại sao chọn A:</strong> Thuật ngữ y học súc tích chỉ khả năng miễn dịch đề kháng chống lại mầm bệnh của cơ thể sinh học là <em>'immunity to disease'</em>.<br><strong>4. Tại sao các từ khác sai:</strong> 'protection' thường đi với giới từ 'against' chứ ít khi đi với to trong văn cảnh y học phòng bệnh cụ thể này."
+                    },
+                    {
+                        uid: "10_10", blankNum: 10, prompt: "Chọn đáp án thích hợp điền vào ô trống số (10):",
+                        options: ["ourselves", "them", "us", "everyone"], correct: "ourselves",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Chúng ta không thể tự nuôi sống, may mặc hay tự giữ ấm cho bản thân mình nếu thiếu công nghệ.<br><strong>2. Phân tích đại từ phản thân 4 đáp án:</strong> Bổ nghĩa hành động tác động ngược lại chính chủ ngữ câu.<br><strong>3. Tại sao chọn A:</strong> Chủ ngữ đứng đầu câu là đại từ số nhiều <em>'We'</em> (Chúng ta). Khi hành động tự giữ ấm tác động quay ngược lại chính chủ thể thực hiện, ta bắt buộc áp dụng đại từ phản thân tương ứng số nhiều là 'ourselves'.<br><strong>4. Tại sao các từ khác sai:</strong> Vi phạm quy tắc sử dụng đại từ phản thân đồng bộ với chủ ngữ chính."
+                    }
+                ]
+            },
+            {
+                passageId: 11,
+                title: "Passage 11 (Đề tuyển sinh vào lớp 10 THPT Chuyên Tỉnh Vĩnh Phúc)",
+                textMarkup: "Tom Cruise is one of the most successful actors in cinema history. <span class='passage-blank-badge' id='badge-11-1'>(1)</span>, life hasn’t always been that easy for him. As a young boy, Tom was shy and had <span class='passage-blank-badge' id='badge-11-2'>(2)</span> in finding friends, although he enjoyed taking part in school plays. <span class='passage-blank-badge' id='badge-11-3'>(3)</span> he had finished High School, Tom went to New York to look for work. He found employment as a porter, and at the same time he attended drama classes. In 1980, the film director Franco Zeffirelli <span class='passage-blank-badge' id='badge-11-4'>(4)</span> Tom his first part in a film. Ten years later, he had become <span class='passage-blank-badge' id='badge-11-5'>(5)</span> successful that he was one of the highestpaid actors in Hollywood earning millions of dollars for each film. Today, Tom still appears in films and is as popular as ever with his thousands of fans from all over the world.",
+                questions: [
+                    {
+                        uid: "11_1", blankNum: 1, prompt: "Chọn đáp án thích hợp điền vào ô trống số (1):",
+                        options: ["However", "Therefore", "Moreover", "Consequently"], correct: "However",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Tuy nhiên, cuộc sống không phải lúc nào cũng dễ dàng suôn sẻ đối với anh ấy.<br><strong>2. Phân tích trạng từ liên kết đứng đầu câu có dấu phẩy 4 đáp án:</strong><br>- A. However: Tuy nhiên (chỉ sự đối lập tranh chấp nghĩa).<br>- B. Therefore: Do đó (nhân quả).<br><strong>3. Tại sao chọn A:</strong> Câu trước ca ngợi thành công rực rỡ danh vọng lớn của Tom, câu sau lập tức kể về chuỗi khó khăn góc khuất cuộc đời. Trạng từ liên kết mang sắc thái đối lập duy nhất phù hợp là 'However'.<br><strong>4. Tại sao các từ khác sai:</strong> Làm sai lệch hoàn toàn mối quan hệ logic đối lập tương phản giữa hai câu văn bối cảnh."
+                    },
+                    {
+                        uid: "11_2", blankNum: 2, prompt: "Chọn đáp án thích hợp điền vào ô trống số (2):",
+                        options: ["difficulty", "ease", "fun", "interest"], correct: "difficulty",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Khi còn là một cậu bé, Tom rất nhút nhát và gặp nhiều khó khăn trong việc kết giao bạn bè...<br><strong>2. Phân tích công thức ngữ pháp 4 đáp án:</strong> Cấu trúc đi với giới từ 'in + V-ing'.<br><strong>3. Tại sao chọn A:</strong> Ta áp dụng công thức kinh điển miêu tả sự trở ngại khó khăn: <em>'have difficulty (in) doing something'</em> (gặp khó khăn vất vả khi làm việc gì).<br><strong>4. Tại sao các từ khác sai:</strong> Tính từ nhút nhát 'shy' dẫn tới hệ quả tiêu cực, không thể là sự dễ dàng (ease) hay niềm vui (fun)."
+                    },
+                    {
+                        uid: "11_3", blankNum: 3, prompt: "Chọn đáp án thích hợp điền vào ô trống số (3):",
+                        options: ["After", "Before", "While", "Until"], correct: "After",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Sau khi đã hoàn thành tốt nghiệp trường Trung học, Tom lên New York để tìm kiếm việc làm.<br><strong>2. Phân tích trình tự thời gian 4 đáp án:</strong> Liên từ chỉ mốc thời gian hành động.<br><strong>3. Tại sao chọn A:</strong> Hành động học xong xảy ra trước và đã hoàn tất chia ở thì Quá khứ hoàn thành ('had finished'), hành động rời quê lên New York tìm việc xảy ra sau chia quá khứ đơn ('went'). Liên từ phù hợp logic thời gian chuỗi sự kiện là 'After'.<br><strong>4. Tại sao các từ khác sai:</strong> Vi phạm trình tự dòng thời gian phát triển sự nghiệp nhân vật."
+                    },
+                    {
+                        uid: "11_4", blankNum: 4, prompt: "Chọn đáp án thích hợp điền vào ô trống số (4):",
+                        options: ["gave", "took", "rented", "demanded"], correct: "gave",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Vào năm 1980, đạo diễn điện ảnh Franco Zeffirelli đã trao cho Tom vai diễn đầu tiên trong một bộ phim.<br><strong>2. Phân tích cấu trúc động từ 2 tân ngữ 4 đáp án:</strong> Cấu trúc 'V + Tân ngữ 1 (Tom) + Tân ngữ 2 (his first part)'.<br><strong>3. Tại sao chọn A:</strong> Động từ <em>'give someone something'</em> (trao tặng, trao cơ hội cho ai cái gì). Cụm từ 'give someone a part/role' nghĩa là giao vai diễn nghệ thuật cho diễn viên.<br><strong>4. Tại sao các từ khác sai:</strong> Các động từ khác không đi với cấu trúc hai tân ngữ song hành mang nghĩa trao tặng cơ hội."
+                    },
+                    {
+                        uid: "11_5", blankNum: 5, prompt: "Chọn đáp án thích hợp điền vào ô trống số (5):",
+                        options: ["so", "such", "too", "very"], correct: "so",
+                        explain: "<strong>1. Dịch nghĩa ngữ cảnh câu:</strong> Mười năm sau, anh ấy đã trở nên thành công đến mức anh ấy trở thành một trong những tài tử được trả cát-xê cao nhất Hollywood...<br><strong>2. Phân tích cấu trúc nhấn mạnh hệ quả 4 đáp án:</strong> Có từ khóa 'that' đứng ở vế sau câu.<br><strong>3. Tại sao chọn A:</strong> Áp dụng công thức cấu trúc nhấn mạnh nguyên nhân kết quả đi với tính từ 'successful': <em>'S + be + SO + Adj + THAT + mệnh đề'</em> (đến mức mà...).<br><strong>4. Tại sao các từ khác sai:</strong> 'such' bắt buộc phải đi kèm cụm danh từ chứ không đứng trực tiếp một mình trước tính từ trơ trọi trong cấu trúc nhấn mạnh hệ quả này."
+                    }
+                ]
+            }
+        ];
+
+        let trackingUserAnswers = {};
+
+        // Hàm xáo ngẫu nhiên vị trí các lựa chọn ABCD để chống học vẹt
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Khởi tạo render toàn bộ cây giao diện bài thi tương tác
+        function buildCompleteQuiz() {
+            const engineContainer = document.getElementById('dynamic-quiz-engine');
+            engineContainer.innerHTML = ""; // Xóa dữ liệu cũ nếu có
+
+            examDatabase.forEach((passage) => {
+                // 1. Tạo hộp tiêu đề đoạn văn lớn
+                const titleNode = document.createElement('div');
+                titleNode.className = 'passage-block-title';
+                titleNode.innerText = passage.title;
+                engineContainer.appendChild(titleNode);
+
+                // 2. Tạo hộp hiển thị đoạn văn gốc toàn vẹn dữ liệu chứa các badge ô trống
+                const textCardNode = document.createElement('div');
+                textCardNode.className = 'passage-text-display';
+                textCardNode.innerHTML = passage.textMarkup;
+                engineContainer.appendChild(textCardNode);
+
+                // 3. Render danh sách các câu hỏi trắc nghiệm ABCD đi kèm dưới đoạn văn đó
+                passage.questions.forEach((q) => {
+                    const qCard = document.createElement('div');
+                    qCard.className = 'question-card';
+                    qCard.id = `card-wrapper-${q.uid}`;
+
+                    // Sao chép mảng đáp án để tiến hành đảo ngẫu nhiên vị trí linh hoạt
+                    let mixedOptions = [...q.options];
+                    shuffleArray(mixedOptions);
+
+                    let optionsListHtml = `<div class="options-grid">`;
+                    mixedOptions.forEach((optionText, index) => {
+                        const prefixes = ["A", "B", "C", "D"];
+                        const isCorrectOption = (optionText === q.correct);
+                        optionsListHtml += `
+                            <button class="option-btn" data-correct="${isCorrectOption}" onclick="checkSelectedOption(this, '${q.uid}', '${passage.passageId}', ${q.blankNum}, '${q.correct}')">
+                                <strong>${prefixes[index]}.</strong> ${optionText}
+                            </button>
+                        `;
+                    });
+                    optionsListHtml += `</div>`;
+
+                    qCard.innerHTML = `
+                        <div class="card-header-info">Ô trống số (${q.blankNum})</div>
+                        <div class="prompt-title">${q.prompt}</div>
+                        ${optionsListHtml}
+                        <div class="explanation-box" id="explain-box-${q.uid}">
+                            <div class="explanation-title">💡 GIẢI THÍCH CHI TIẾT TỪ MS LÊ HẰNG ENGLISH:</div>
+                            <div class="explanation-content">${q.explain}</div>
+                        </div>
+                    `;
+                    engineContainer.appendChild(qCard);
+                });
+            });
+        }
+
+        // Xử lý kiểm tra chấm điểm tức thì khi click chọn một phương án
+        function checkSelectedOption(buttonDom, questionUid, passageId, blankNum, correctValue) {
+            // Nếu câu này học sinh đã click chọn rồi thì khóa lại chống đổi ý gian lận
+            if (trackingUserAnswers[questionUid] !== undefined) return;
+
+            const isCorrect = buttonDom.getAttribute('data-correct') === 'true';
+            trackingUserAnswers[questionUid] = isCorrect;
+
+            const targetCard = document.getElementById(`card-wrapper-${questionUid}`);
+            const siblingButtons = targetCard.querySelectorAll('.option-btn');
+            const inlineBadge = document.getElementById(`badge-${passageId}-${blankNum}`);
+
+            if (isCorrect) {
+                // CHỌN ĐÚNG: Nút hóa xanh lá cây, nổ tiếng Ding vui tai, bắn pháo giấy, đổi chữ trên đoạn văn
+                buttonDom.classList.add('correct');
+                triggerAudioFeedback('correct');
+                burstConfettiParticles();
+                if (inlineBadge) {
+                    inlineBadge.innerText = correctValue;
+                    inlineBadge.className = "passage-blank-badge answered-correct";
+                }
+            } else {
+                // CHỌN SAI: Nút hóa đỏ cam, thẻ bài câu hỏi lắc lư mạnh, nổ tiếng teo tèo, hiện chữ đáp án đúng lên đoạn văn
+                buttonDom.classList.add('wrong');
+                targetCard.classList.add('shake-animation');
+                triggerAudioFeedback('wrong');
+
+                // Tự động tô màu xanh cho nút chứa đáp án đúng để học sinh đối chiếu tự học
+                siblingButtons.forEach(btn => {
+                    if (btn.getAttribute('data-correct') === 'true') {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                if (inlineBadge) {
+                    inlineBadge.innerText = correctValue;
+                    inlineBadge.className = "passage-blank-badge answered-wrong";
+                }
+
+                setTimeout(() => {
+                    targetCard.classList.remove('shake-animation');
+                }, 450);
+            }
+
+            // Vô hiệu hóa tất cả các nút bấm còn lại của câu hiện tại chống bấm lại
+            siblingButtons.forEach(btn => btn.classList.add('disabled'));
+
+            // TỰ ĐỘNG HIỆN KHUNG GIẢI THÍCH 4 BƯỚC NGAY LẬP TỨC CHO HỌC SINH ĐỌC GHI CHÉP
+            const explainView = document.getElementById(`explain-box-${questionUid}`);
+            if (explainView) {
+                explainView.style.display = 'block';
+            }
+        }
+
+        // Thuật toán Canvas sinh hạt pháo giấy Confetti bay chúc mừng câu trả lời đúng mượt mà
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function burstConfettiParticles() {
+            const colors = ['#8854C0', '#FDCB6E', '#00C9A7', '#FF4757', '#00D26A', '#FFFFFF'];
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 6 + 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedX: Math.random() * 4 - 2,
+                    speedY: Math.random() * 4 + 4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 4 - 2
+                });
+            }
+        }
+
+        function renderConfettiAnimationLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.rotation += p.rotationSpeed;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                if (p.y > canvas.height) {
+                    particles.splice(index, 1);
+                }
+            });
+            requestAnimationFrame(renderConfettiAnimationLoop);
+        }
+        requestAnimationFrame(renderConfettiAnimationLoop);
+
+        // Hàm tính toán và tổng hợp kết quả thi khi bấm nút "Nộp bài" cuối trang
+        function calculateExamResult() {
+            let totalBlanksCount = 0;
+            let correctAnswersCount = 0;
+
+            examDatabase.forEach(passage => {
+                totalBlanksCount += passage.questions.length;
+                passage.questions.forEach(q => {
+                    if (trackingUserAnswers[q.uid] === true) {
+                        correctAnswersCount++;
+                    }
+                });
+            });
+
+            let finalPercentage = (correctAnswersCount / totalBlanksCount) * 100;
+            let teacherComment = "";
+
+            if (finalPercentage < 50) {
+                teacherComment = "Điểm lần này chưa cao lắm, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+            } else if (finalPercentage >= 60 && finalPercentage <= 80) {
+                teacherComment = "Con đã có tiến bộ khá ổn rồi, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+            } else {
+                teacherComment = "Làm tốt lắm, con cố gắng ring điểm 10 ở lần sau nha!";
+            }
+
+            // Ghi dữ liệu hiển thị lên Popup Modal công bố kết quả
+            document.getElementById('score-display-box').innerText = `${correctAnswersCount} / ${totalBlanksCount}`;
+            document.getElementById('feedback-display-box').innerText = teacherComment;
+
+            // Bật tung popup ra giữa màn hình nền mờ ảo
+            document.getElementById('score-modal').classList.add('active');
+
+            // Bắn một loạt pháo giấy liên tục ăn mừng nếu con đạt điểm số giỏi từ 75% trở lên
+            if (finalPercentage >= 75) {
+                for (let k = 0; k < 5; k++) {
+                    setTimeout(burstConfettiParticles, k * 260);
+                }
+            }
+        }
+
+        // Reset khôi phục trạng thái ban đầu của bài thi để làm lại đề
+        function restartEntireQuiz() {
+            trackingUserAnswers = {};
+            particles = [];
+            document.getElementById('score-modal').classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Cuộn mượt màn hình lên trên đầu
+            setTimeout(buildCompleteQuiz, 400); // Tải lại toàn bộ câu hỏi và xáo trộn phương án mới tinh
+        }
+
+        // Tự động khởi chạy kết xuất giao diện bài thi trắc nghiệm ngay khi trình duyệt sẵn sàng
+        window.onload = function() {
+            buildCompleteQuiz();
+        };
+    </script>
+</body>
+</html>
